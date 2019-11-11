@@ -1,0 +1,308 @@
+<html><head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.3.0/paper.css">
+<style>
+    @page { size: A4 }
+    table { page-break-inside: avoid; font-size: 12px }
+    html { font-family: helvetica;}
+    .logo { float: left; padding: 0px; }
+    .header { padding: 0px;margin-top: 0px; }
+    .header p { margin-top: 0;margin-bottom: 0; text-transform: uppercase; text-align: center; }
+	p { font-size: 12px;}
+    p.bbws { font-weight: bold; font-size: 18px; }
+    p.tiny { font-size: 9px;}
+	ol { font-size: 12px;}
+	il { font-size: 12px;}
+	hr.new4 {border: 1px solid black;}
+    h3 { line-height: 80%; font-size:14px; }
+    .table-bordered { border: solid 1px black; sborder-collapse: collapse; border-spacing: 0; }
+    .table-bordered th { padding: 2px; border: solid 1px black; }
+    th, td { margin: 0; padding: 2px; border: solid 1px black;}
+    .text-right { text-align: right; }
+    .jam { font-size: 10px;}
+    .text-center { text-align: center; }
+    .mengetahui { width: 33%; float: left; font-size: 12px;}
+    pre { white-space:pre-wrap }
+    .sheet {
+      overflow: visible;
+      height: auto !important;
+      page-break-inside: avoid;
+    }
+    #sebab {
+      height: 100%;
+    }
+    #tindakan {
+      height: 100%;
+    }
+</style>
+
+<!-- QuillJS HTML Editor -->
+<link rel="stylesheet" href="//cdn.quilljs.com/1.3.6/quill.snow.css">
+
+</head>
+<body class="A4">
+<section class="sheet padding-10mm">
+<div class="container">
+    <div class="logo">
+    <img src="{{ url_for('static', filename='images/icon_pu.jpg') }}" alt="Logo PUPR" width="80" height="80">
+</div>
+<div class="header">
+    <p>Kementerian Pekerjaan Umum dan Perumahan Rakyat</p>
+    <p>Direktorat Jenderal Sumber Daya Air</p>
+    <p class="bbws">Balai Besar Wilayah Sungai Bengawan Solo</p>
+    <p class="tiny">Jl. Solo - Kartasura Km. 7 PO BOX 267 Telp/Fax (0271) 716071, Pabelan, Kartasura, Sukoharjo 57162</p>
+</div> <br>
+<hr class="new4">
+<h3>FORMAT A</h3>
+        <p>Kepada Yth.<br>
+		POSKO PB PUPR<br>
+		Ditjen Sumber Daya Air <br>
+		Di <br>
+		Jakarta <br> </p>
+
+		<h4 style="text-align:center"> LAPORAN KEJADIAN BENCANA</h4>
+		<ol type="1">
+		<li>BENCANA</li>
+			<ol type="a">
+			<li>Jenis Bencana: {{ kejadian.jenis }}</li>
+			<li>Waktu Kejadian: {{ kejadian.get_date() }}</li>
+			<li>Tempat Kejadian:</li>
+				<ul style="list-style-type:none;">
+                {% for prov, kab_ in kejadian.sort_desa.items() %}
+                    {% for kab, kec_ in kab_.items() %}
+                        {% for kec, desa in kec_.items() %}
+                            <li>{{ loop.index }}. {{ desa }}</li>
+                            <li style="margin: 0 15px;">Kecamatan {{ kec }}</li>
+                        {% endfor %}
+                        <li><b>Kab/Kota {{ kab }}</b></li>
+                        <li><b>Provinsi {{ prov }}</b></li>
+                    {% endfor %}
+                {% endfor %}
+				</ul>
+			<li>Data Hidrologi :</li>
+			        <table class="table table-bordered boldtable">
+						<thead>
+						<tr style="background-color: #d2d2d2">
+							<th rowspan="2">No</th>
+							<th rowspan="4">Nama Stasiun</th>
+							<th colspan="2">Curah Hujan (mm)</th>
+						</tr>
+						<tr>
+						<td style="background-color: #d2d2d2; text-align:center">{{ kejadian.get_date_before() }}</td>
+						</tr>
+						</thead>
+						<tbody>
+                            {% for pos in kejadian.hidrologi %}
+                            <tr>
+    							<td>{{ loop.index }}.</td>
+    							<td>{{ pos.pos.pos_name }}</td>
+    							<td align="right">{{ pos.ch }} mm</td>
+							</tr>
+                            {% endfor %}
+                        </tbody>
+					</table>
+					<p class="tiny" ><i>Sumber: BBWS Bengawa Solo</i></p>
+			</ol>
+		<li>KORBAN /  KERUSAKAN YANG TELAH TERJADI</li>
+			<ol type="a">
+				<li>Korban:</li>
+					<ul style="list-style-type:circle;">
+                        {% if kejadian.summary.korban.md == 0 %}
+                            <li>Meninggal : Tidak Ada</li>
+                        {% else %}
+						    <li>Meninggal : {{ kejadian.summary.korban.md }} Jiwa</li>
+                        {% endif %}
+
+                        {% if kejadian.summary.korban.luka == 0 %}
+                            <li>Luka-luka : Tidak Ada</li>
+                        {% else %}
+						    <li>Luka-luka : {{ kejadian.summary.korban.luka }} Jiwa</li>
+                        {% endif %}
+
+                        {% if kejadian.summary.korban.hilang == 0 %}
+                            <li>Hilang : Tidak Ada</li>
+                        {% else %}
+						    <li>Hilang : {{ kejadian.summary.korban.hilang }} Jiwa</li>
+                        {% endif %}
+
+                        {% if kejadian.summary.korban.pengungsi == 0 %}
+                            <li>Pengungsi : Tidak Ada</li>
+                        {% else %}
+						    <li>Pengungsi : {{ kejadian.summary.korban.pengungsi }} Jiwa</li>
+                        {% endif %}
+					</ul>
+				<li>Kerusakan :</li>
+					<ul style="list-style-type:square">
+						<li>Prasarana Sumber Daya Air / Pertanian :</li>
+						<ul style="list-style-type:circle;">
+                            {% if kejadian.sungai == 0 %}
+                                <li>Sungai : Tidak Ada</li>
+                            {% else %}
+                                <li>Sungai : {{ kejadian.sungai }}</li>
+                            {% endif %}
+
+                            {% if kejadian.sawah == 0 %}
+                                <li>Sawah : Tidak Ada</li>
+                            {% else %}
+                                <li>Sawah : {{ kejadian.sawah }} Ha</li>
+                            {% endif %}
+
+                            {% if kejadian.bangunan == 0 %}
+                                <li>Bangunan Pengairan : Tidak Ada</li>
+                            {% else %}
+                                <li>Bangunan Pengairan : {{ kejadian.bangunan }}</li>
+                            {% endif %}
+						</ul>
+						<li>Prasarana Jalan dan Jembatan :</li>
+							<ul style="list-style-type:circle;">
+                                {% if kejadian.jalan == 0 %}
+                                    <li>Jalan : Tidak Ada</li>
+                                {% else %}
+        						    <li>Jalan : {{ kejadian.jalan }} Km</li>
+                                {% endif %}
+
+                                {% if kejadian.jembatan == 0 %}
+                                    <li>Jembatan : Tidak Ada</li>
+                                {% else %}
+        						    <li>Jembatan : {{ kejadian.jembatan }} Jembatan</li>
+                                {% endif %}
+							</ul>
+						<li>Prasarana Pemukiman :</li>
+							<ul style="list-style-type:circle;">
+                                {% if kejadian.summary.bangunan.rumah == 0 %}
+                                    <li>Rumah : Tidak Ada</li>
+                                {% else %}
+        						    <li>Rumah :</li>
+                                    <ul>
+                                    {% for kec, info in kejadian.rusak_desa.items() %}
+                                        {% if info.rumah > 0 %}
+                                            <li>Kecamatan {{ kec }}</li>
+                                            <ul style="list-style-type:none;">
+                                                {% for desa in info.dd %}
+                                                    {% if desa.rumah > 0 %}
+                                                        <li>Desa {{ desa.desa.desa }} : {{ desa.rumah }} Rumah</li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                {% if kejadian.summary.bangunan.sekolah == 0 %}
+                                    <li>Sekolah : Tidak Ada</li>
+                                {% else %}
+        						    <li>Sekolah :</li>
+                                    <ul>
+                                    {% for kec, info in kejadian.rusak_desa.items() %}
+                                        {% if info.sekolah > 0 %}
+                                            <li>Kecamatan {{ kec }}</li>
+                                            <ul style="list-style-type:none;">
+                                                {% for desa in info.dd %}
+                                                    {% if desa.sekolah > 0 %}
+                                                        <li>Desa {{ desa.desa.desa }} : {{ desa.sekolah }} Sekolah</li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                {% if kejadian.summary.bangunan.t_ibadah == 0 %}
+                                    <li>Tempat Ibadah : Tidak Ada</li>
+                                {% else %}
+        						    <li>Tempat Ibadah :</li>
+                                    <ul>
+                                    {% for kec, info in kejadian.rusak_desa.items() %}
+                                        {% if info.t_ibadah > 0 %}
+                                            <li>Kecamatan {{ kec }}</li>
+                                            <ul style="list-style-type:none;">
+                                                {% for desa in info.dd %}
+                                                    {% if desa.t_ibadah > 0 %}
+                                                        <li>Desa {{ desa.desa.desa }} : {{ desa.t_ibadah }} Tempat Ibadah</li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </ul>
+                                {% endif %}
+						</ul>
+					</ul>
+			</ol>
+		<li>SEBAB TERJADI BENCANA</li>
+            <ol>
+                <!-- <pre>{{ kejadian.sebab }}</pre> -->
+                <div id="sebab">
+
+                </div>
+            </ol>
+		<li>PERKIRAAN LAMANYA TERJADI BENCANA</li>
+            <ol>
+                {% if kejadian.lama %}
+                <pre>{{ kejadian.lama }} Hari</pre>
+                {% else %}
+                <pre>-</pre>
+                {% endif %}
+            </ol>
+		<li>PENANGANAN DARURAT YANG TELAH DILAKUKAN</li>
+            <ol>
+                <!-- <pre>{{ kejadian.tindakan }}</pre> -->
+                <div id="tindakan">
+
+                </div>
+            </ol>
+	</ol>
+
+    <!-- -->
+             </tbody>
+         </table>
+         <div class="text-center">
+         <div class="mengetahui kiri">&nbsp;</div>
+         <div class="mengetahui tengah">&nbsp;</div>
+         <div class="mengetahui kanan">Sukoharjo,<br>
+             a/n. Kepala Balai Besar<br>Wilayah Sungai Bengawan Solo<br>Kabid O&P <br><br><br><br>ttd<br><br><span style="text-decoration: underline;">Sri Wahyu Kusumastuti, ST, MSi</span><br>
+                 NIP. 19720104 199803 2 006</div>
+    </div>
+	<p>Tembusan Kepada Yth:
+	<ol type="1">
+	<li>Sekretariat Satgas PBPU;</li>
+	<li>Kepala Balai Besar Wilayah Sungai Bengawan Solo (Sebagai Laporan);</li>
+	<li>Arsip;</li></ol></p>
+    </div>
+    </section>
+<section class="sheet padding-10mm">
+	<h4 style="text-align:center"> Foto Dokumentasi Banjir Kabupaten Tuban <br>Tanggal
+</h4>
+</section>
+
+<!-- QuillJS HTML Editor -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
+<!-- The Script Right below is used to render editor and saved the content to hidden form field -->
+<script>
+    let options = {
+        modules: {
+            "toolbar": false
+        },
+        readOnly: true,
+        theme: 'snow'
+    }
+    function escape(theString) {
+        let result = theString.replace(/\n/g, "\\n")
+        console.log(result)
+        return result
+    }
+
+    let sebabStr = escape('{{ kejadian.sebab|safe }}');
+    let editorSebab = new Quill('#sebab', options);
+    editorSebab.setContents(JSON.parse(sebabStr));
+
+    let tindakanStr = escape('{{ kejadian.tindakan|safe }}');
+    let editorTindakan = new Quill('#tindakan', options);
+    editorTindakan.setContents(JSON.parse(tindakanStr));
+
+</script>
+
+
+</body></html>

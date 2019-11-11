@@ -1,0 +1,385 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Kejadian</li>
+      </ol>
+    </nav>
+    <div>
+        {% if context.kejadian.dampakdesa.count() %}
+          <h3 class="d-inline">{{ context.kejadian.jenis }}, Kab. {{ context.kejadian.dampakdesa.0.desa.kabupaten }}, {{ context.kejadian.get_date_id() }}</h3>
+        {% else %}
+          <h3 class="d-inline">{{ context.kejadian.jenis }}, {{ context.kejadian.get_date_id() }}</h3>
+        {% endif %}
+          <a class="btn btn-sm btn-outline-info d-inline" href="{{ url_for('admin.laporan', kejadian_id=context.kejadian.id) }}">Print</a>
+    </div>
+  <br>
+  <table class="table table-bordered">
+    <tbody>
+      <!-- <tr>
+        <th>Waktu</th>
+        <td colspan="3">{{ context.kejadian.get_date_id() }}</td>
+        <th>Jenis</th>
+        <td>{{ context.kejadian.jenis }}</td>
+      </tr> -->
+      <tr>
+        <th>Sebab</th>
+        <td colspan="5">
+            <pre>{{ context.kejadian.sebab }}</pre>
+            <!-- <textarea>{{ context.kejadian.sebab }}</textarea> -->
+        </td>
+      </tr>
+      <tr>
+        <th>Lama</th>
+        <td colspan="5">{{ context.kejadian.lama }} Hari</td>
+      </tr>
+      <tr>
+        <th>Tindakan</th>
+        <td colspan="5">
+            <pre>{{ context.kejadian.tindakan }}</pre>
+            <!-- <textarea>{{ context.kejadian.tindakan }}</textarea> -->
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="table table-bordered">
+    <thead class="table-active">
+      <tr>
+        <th colspan="6">KERUSAKAN</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th colspan="6">Prasarana Sumber Daya Air / Pertanian</th>
+      </tr>
+      <tr>
+        <th>Sungai</th>
+        <td>{{ context.kejadian.sungai }}</td>
+        <th>Sawah</th>
+        <td>{{ context.kejadian.sawah }} Ha</td>
+        <th>Bangunan Pengairan</th>
+        <td>{{ context.kejadian.bangunan }}</td>
+      </tr>
+      <tr>
+        <th colspan="6">Prasarana Jalan dan Jembatan</th>
+      </tr>
+      <tr>
+        <th>Jalan</th>
+        <td>{{ context.kejadian.jalan }} Km</td>
+        <th>Jalan Putus</th>
+        <td>{{ context.kejadian.jalan_putus }} Km</td>
+        <th>Jembatan</th>
+        <td>{{ context.kejadian.jembatan }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <div class="container" align="center" style="max-width: 100%">
+
+    <a class="btn btn-outline-primary" href="{{ url_for('admin.update_kejadian', kejadian_id=context.kejadian.id) }}">Ubah Kejadian</a>
+    <button class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteVerification">Hapus Kejadian</button>
+
+    <!-- Delete Verification Modal -->
+    <div class="modal fade" id="deleteVerification" tabindex="-1" role="dialog" aria-labelledby="deleteVerificationLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteVerificationLabel">Hapus Kejadian</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" align="left">
+            Anda yakin ingin menghapus data kejadian?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <a class="btn btn-danger" href="{{ url_for('admin.delete_kejadian', kejadian_id=context.kejadian.id) }}">Hapus</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <hr>
+  <div>
+      <h3 class="d-inline">Desa yang Terdampak ({{ context.kejadian.dampakdesa.count() }})</h3>
+      <a class="btn btn-sm btn-outline-primary d-inline" href="{{ url_for('admin.tambah_dampakdesa', kejadian_id=context.kejadian.id) }}">Tambah</a>
+  </div>
+  <br>
+  {% if context.kejadian.dampakdesa %}
+    <table class="table table-bordered">
+      <thead class="table-active">
+        <tr>
+          <th>No</th>
+          <th>Informasi</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for desa in context.kejadian.dampakdesa %}
+        <tr>
+          <th>{{ loop.index }}</th>
+          <td>{{ desa.desa.desa }}<br>
+            (LK:{{ desa.luka }}, MD:{{ desa.md }}, HL:{{ desa.hilang }}, PN:{{ desa.pengungsi }})<br>
+            (RM:{{ desa.rumah }}, SK:{{ desa.sekolah }}, TI:{{ desa.t_ibadah }})</td>
+          <td>
+            <a class="btn btn-sm btn-outline-info" href="{{ url_for('admin.update_dampakdesa', dampakdesa_id=desa.id) }}">Ubah</a>
+            <button class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#deleteDesa{{ desa.id }}">Hapus</button>
+
+            <!-- Delete Verification Modal -->
+            <div class="modal fade" id="deleteDesa{{ desa.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteDesaLabel{{ desa.id }}" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="deleteDesaLabel{{ desa.id }}">Hapus Desa {{ desa.desa.desa }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body" align="left">
+                    Anda yakin ingin menghapus data desa terdampak?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a class="btn btn-danger" href="{{ url_for('admin.delete_dampakdesa', dampakdesa_id=desa.id) }}">Hapus</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Tidak Ada Data</p>
+  {% endif %}
+  <br>
+
+  <div>
+      <h3 class="d-inline">Sumber Hidrologi ({{ context.kejadian.hidrologi.count() }})</h3>
+    <a class="btn btn-sm btn-outline-primary d-inline" href="{{ url_for('admin.tambah_sumberhidrologi', kejadian_id=context.kejadian.id) }}">Tambah</a>
+  </div>
+  <br>
+  {% if context.kejadian.hidrologi %}
+    <table class="table table-bordered">
+      <thead class="table-active">
+        <tr>
+          <th>No</th>
+          <th>Informasi</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sumber in context.kejadian.hidrologi %}
+        <tr>
+          <th>{{ loop.index }}</th>
+          <td>{{ sumber.pos.pos_name }}<br>
+            (CH: {{ sumber.ch }} mm, Durasi: {{ sumber.durasi }} Jam)
+          </td>
+          <td>
+            <a class="btn btn-sm btn-outline-info" href="{{ url_for('admin.update_sumberhidrologi', hidrologi_id=sumber.id) }}">Ubah</a>
+            <button class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#deleteSumber{{ sumber.id }}">Hapus</button>
+
+            <!-- Delete Verification Modal -->
+            <div class="modal fade" id="deleteSumber{{ sumber.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteSumberLabel{{ sumber.id }}" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="deleteSumberLabel{{ sumber.id }}">Hapus Sumber Hidrologi {{ sumber.pos.pos_name }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body" align="left">
+                    Anda yakin ingin menghapus data sumber hidrologi?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a class="btn btn-danger" href="{{ url_for('admin.delete_sumberhidrologi', hidrologi_id=sumber.id) }}">Hapus</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Tidak Ada Data</p>
+  {% endif %}
+  <br>
+
+  <h3>Foto Kejadian ({{ context.kejadian.foto.count() }})</h3>
+  <br>
+  {% if context.kejadian.foto.count() %}
+  <div>
+    <ul>
+      {% for foto in context.kejadian.foto %}
+        <img src="{{ url_for('static', filename=foto.get_url()) }}" class="img-fluid" alt="Responsive image">
+      {% endfor %}
+    </ul>
+  </div>
+  <br>
+  {% endif %}
+    <div class="form-row">
+        <div class="col-md-12 mb-3">
+            <label for="foto">Upload Foto</label>
+    		<input accept="image/*" class="form-control" id="foto" multiple="" name="foto" type="file">
+        <div class="gallery" id="gallery">
+
+        </div>
+      </div>
+    </div>
+    <div>
+        <button class="btn btn-outline-primary" type="button" name="button" onclick="upload_photo()">Upload</button>
+      <!-- {{ context.form.submit(class="btn btn-outline-primary", value="Upload") }} -->
+    </div>
+  <br>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='js/MinifyJpegAsync.js') }}"></script>
+<script>
+    function arrayBufferToBase64(buffer) {
+        let binary = '';
+        let bytes = buffer // new Uint8Array(buffer);
+        let len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(binary);
+    }
+
+    function post(data) {
+        let array = [];
+        for (let p=0; p<data.length; p++) {
+            array[p] = data.charCodeAt(p);
+        }
+        let u8array = new Uint8Array(array);
+        let cleaned = u8array.buffer;
+        console.log("Uploading Files")
+        fetch("{{ url_for('admin.upload', kejadian_id=context.kejadian.id) }}", { // Your POST endpoint
+            method: 'POST',
+            headers: {
+              // Content-Type may need to be completely **omitted**
+              // or you may need something
+              "Content-Type": "image/jpeg"
+            },
+            body: cleaned // This is your file object
+          }).then(
+            response => response.json() // if the response is a JSON object
+          ).then(
+            success => console.log(success) // Handle the success response object
+          ).catch(
+            error => console.log(error) // Handle the error response object
+          );
+    }
+
+    function handleFileSelect(el) {
+        var files = el.files;
+        console.log("Handling Files")
+
+        for (var i = 0, f; f = files[i]; i++){
+            var reader = new FileReader();
+            reader.onloadend = function(e){
+                MinifyJpegAsync.minify(e.target.result, 1024, post);
+            };
+            reader.readAsDataURL(f);
+        }
+    }
+
+    function refresh(){
+        location.reload();
+    }
+
+    function upload_photo() {
+        let photos = document.getElementById('foto');
+        handleFileSelect(photos);
+        setTimeout(refresh(), 3000);
+    }
+</script>
+<script>
+
+    $(function() {
+        // Function to handle each preview
+        let imgPreview = function(file, placeToInsertImagePreview, index) {
+            var img = document.createElement("img");
+            var reader = new FileReader();
+
+            reader.onload = function(event) {
+                img.src = event.target.result;
+            }
+
+            img.onload = function () {
+                var canvas = document.createElement("canvas");
+                //var canvas = $("<canvas>", {"id":"testing"})[0];
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(this, 0, 0);
+
+                var MAX_WIDTH = 1080;
+                var MAX_HEIGHT = 1080;
+                var width = this.width;
+                var height = this.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext("2d").drawImage(this, 0, 0, width, height);
+
+                var dataurl = canvas.toDataURL("image/jpg");
+                // document.getElementById('output').src = dataurl;
+                // console.log(dataurl)
+
+                $($.parseHTML('<img>')).attr('src', dataurl).appendTo(placeToInsertImagePreview);
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // Multiple images preview in browser
+        var imagesPreview = function(input) {
+
+            if (input.files) {
+                var filesAmount = input.files.length;
+                console.log(filesAmount)
+
+                for (i = 0; i < filesAmount; i++) {
+                    imgPreview(input.files[i], 'div.gallery', i);
+                }
+            }
+
+        };
+
+        $('#foto').on('change', function() {
+            imagesPreview(this);
+        });
+    });
+</script>
+
+{% endblock content %}
+
+{% block extra_head %}
+
+{% endblock %}
+
+{% block extra_foot %}
+    <!-- QuillJS HTML Editor -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+{% endblock %}

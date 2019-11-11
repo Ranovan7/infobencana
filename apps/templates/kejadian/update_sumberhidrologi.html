@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" align="center">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.lihat_kejadian', kejadian_id=kejadian_id) }}">Kejadian</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Ubah Hidrologi</li>
+      </ol>
+    </nav>
+  <h3>Update Sumber Hidrologi</h3>
+  <br>
+  <form method="POST">
+    {{ form.csrf_token() }}
+    <div class="col-md-10" style="max-height: 300px">
+    	<div id="mappos" style="border: solid 1px #eee; height: 300px">
+      </div>
+    </div>
+    <div class="form-row">
+	    <div class="col-md-12 mb-3" align="left">
+				{{ form.pos.label(for="pos") }}
+        <select class="form-control selectpicker" data-live-search="true" id="pos" name="pos">
+          {% for option in form.pos.choices %}
+            {% if option.0 == sumberhidrologi.pos_id %}
+              <option value="{{ option.0 }}" selected>{{ option.1 }}</option>
+            {% else %}
+              <option value="{{ option.0 }}">{{ option.1 }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+				{% for error in form.pos.errors %}
+					<div class="invalid-feedback d-block">
+						{{ error }}
+					</div>
+				{% endfor %}
+	    </div>
+	  </div>
+	  <div class="form-row">
+	    <div class="col-md-6 mb-3" align="left">
+				{{ form.ch.label(for="ch") }}
+        <div class="input-group">
+	        {{ form.ch(class="form-control", id="ch", type="number") }}
+					<div class="input-group-append">
+				    <span class="input-group-text" id="basic-addon2">mm</span>
+				  </div>
+				</div>
+				{% for error in form.ch.errors %}
+					<div class="invalid-feedback d-block">
+						{{ error }}
+					</div>
+				{% endfor %}
+	    </div>
+      <div class="col-md-6 mb-3" align="left">
+				{{ form.durasi.label(for="durasi") }}
+        <div class="input-group">
+	        {{ form.durasi(class="form-control", id="durasi", type="number") }}
+					<div class="input-group-append">
+				    <span class="input-group-text" id="basic-addon2">Jam</span>
+				  </div>
+				</div>
+				{% for error in form.durasi.errors %}
+					<div class="invalid-feedback d-block">
+						{{ error }}
+					</div>
+				{% endfor %}
+	    </div>
+	  </div>
+    <div>
+      {{ form.submit(value="Ubah", class="btn btn-outline-primary") }}
+      <a class="btn btn-outline-danger" href="{{ url_for('admin.lihat_kejadian', kejadian_id=sumberhidrologi.kejadian_id) }}">Kembali</a>
+    </div>
+  </form>
+  <hr>
+</div>
+{% endblock content %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+   integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+   crossorigin=""></script>
+   <style>
+     #map {
+       width: 800px;
+       height: 500px;
+     }
+     .info {
+       padding: 6px 8px;
+       font: 14px/16px Arial, Helvetica, sans-serif;
+       background: white;
+       background: rgba(255,255,255,0.8);
+       box-shadow: 0 0 15px rgba(0,0,0,0.2);
+       border-radius: 5px;
+     }
+     .info h6 {
+       margin: 0 0 5px;
+       color: #777;
+     }
+     .legend {
+       text-align: left;
+       line-height: 18px;
+       color: #555;
+     }
+     .legend i {
+       width: 18px;
+       height: 18px;
+       float: left;
+       margin-right: 8px;
+       opacity: 0.7;
+     }
+   </style>
+{% endblock extra_head %}
+
+{% block extra_foot %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+  <script>
+    $(function() {
+        $('.selectpicker').selectpicker()
+    });
+  </script>
+  <script>
+    "use struct"
+  	let mymap = L.map('mappos').setView([-7.5099, 111.5], 10)
+    L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+  		    maxZoom: 18,
+          id: 'data.streets',
+  		    attribution: 'M&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  	   }
+    ).addTo(mymap)
+
+    // function to add markers
+    function show_location(data){
+        // clear all layers firsts
+        mymap.eachLayer(
+            function(layer) {
+                if (!layer._url){
+                    mymap.removeLayer(layer)
+                }
+            }
+        )
+
+        // add marer of the pos to map
+        let marker = L.marker([data.geometry.coordinates[1], data.geometry.coordinates[0]]).addTo(mymap)
+        // popup containing pos name
+        marker.bindPopup(`<b>Pos</b><br>${data.properties.name}`).openPopup()
+        // zoom to pos
+        let latLngs = [ marker.getLatLng() ];
+        let markerBounds = L.latLngBounds(latLngs);
+        mymap.fitBounds(markerBounds)
+        mymap.setZoom(12)
+    }
+
+    // initial
+    let pos_id = $('#pos').val()
+    if (pos_id){
+      console.log(`${pos_id}`)
+      fetch(`/api/pos/${pos_id}`) // Call the fetch function passing the url of the API as a parameter
+        .then(response => response.json())
+        .then(data => show_location(data))
+        .catch(e => console.log(`Error found : ${e}`))
+    }
+
+    // on value changes
+    $("#pos").change(function(){
+        let pos_id = $('#pos').val()
+        console.log(`Pos ID : ${pos_id}`)
+        fetch(`/api/pos/${pos_id}`) // Call the fetch function passing the url of the API as a parameter
+          .then(response => response.json())
+          .then(data => show_location(data))
+          .catch(e => console.log(`Error found : ${e}`))
+    })
+
+  </script>
+{% endblock extra_foot %}

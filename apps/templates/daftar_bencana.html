@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+  <br>
+  <div class="row">
+      <div class="col-sm-2">
+          <!-- Pilihan Tahun -->
+          <div class="form-group">
+              <select class="custom-select" id="tahun" name="tahun" onchange="reload_page()">
+                {% for y in year_option %}
+                  {% if y == year %}
+                    <option value="{{ y }}" selected>{{ y }}</option>
+                  {% else %}
+                    <option value="{{ y }}">{{ y }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+          </div>
+          <div class="form-group">
+              <h3>
+                  <span class="badge badge-outline-secondary">{{ count }} Kejadian</span>
+              </h3>
+          </div>
+      </div>
+      <div class="col-sm-10">
+          <!-- Data Kejadian -->
+          {% for i in info %}
+              <div class="row">
+                  <div class="col-sm-2">
+                      <h5>{{ i.bulan }}</h5>
+                  </div>
+                  <div class="col-sm-10">
+                      <div id="accordion">
+                        {% for k in i.kejadian %}
+                          <div class="card">
+                            <div class="card-header" id="heading{{ k.id }}" style="display: inline">
+                              <div class="row">
+                                  <div class="col-sm-2">
+                                      {% if k.jenis == "Banjir" %}
+                                      <h1>
+                                          <span class="badge badge-secondary">B</span>
+                                      </h1>
+                                      {% else %}
+                                      <h1>
+                                          <span class="badge badge-secondary">L</span>
+                                      </h1>
+                                      {% endif %}
+                                      {{ k.jenis }}
+                                  </div>
+                                  <div class="col-sm-8">
+                                     <b>{{ k.get_date_id() }}</b>
+                                     <br>
+                                     Daerah Kab. {{ k.dampakdesa.0.desa.kabupaten }}
+                                     <br>
+                                     <b>{{ k.dampakdesa_count }}</b> Desa Terdampak
+                                     <br>
+                                     Estimasi Area Terdampak : <b>{{ k.get_affected_area }}</b> Km<sup>2</sup>
+                                  </div>
+                                  <div class="col-sm-2" align="center">
+                                      {% if user.is_authenticated %}
+                                      <div style="margin: 5px">
+                                          <a class="btn btn-sm btn-outline-info" href="{{ url_for('admin.lihat_kejadian', kejadian_id=k.id) }}">
+                                              Ubah
+                                          </a>
+                                      </div>
+                                      {% endif %}
+                                      <div style="margin: 5px">
+                                          <a class="btn btn-sm btn-outline-info" href="{{ url_for('core.map', kid=k.id) }}">
+                                              Peta
+                                          </a>
+                                      </div>
+                                      <div style="margin: 5px">
+                                          <button class="btn btn-sm btn-outline-info" data-toggle="collapse" data-target="#kejadian{{ k.id }}" aria-expanded="false" aria-controls="kejadian{{ k.id }}">
+                                              Detail
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                            </div>
+                            <div id="kejadian{{ k.id }}" class="collapse" aria-labelledby="heading{{ k.id }}" data-parent="#accordion">
+                              <div class="card-body">
+                                <h5 class="card-title">Penyebab</h5>
+                                <pre class="card-text" style="white-space:pre-wrap">{{ k.sebab }}</pre>
+
+                                <h5 class="card-title">Tindakan</h5>
+                                <pre class="card-text" style="white-space:pre-wrap">{{ k.tindakan }}</pre>
+
+                                <h5 class="card-title">Ringkasan</h5>
+                                <div class="row">
+                                  <div class="col d-flex align-items-stretch">
+                                    <div class="card card-body">
+                                      <h6 class="card-title">Korban</h6>
+                                      {% if k.summary.korban.total == 0 %}
+                                        <p class="card-text">Tidak Ada Korban</p>
+                                      {% else %}
+                                        <p class="card-text">Luka-luka : {{ k.summary.korban.luka }}</p>
+                                        <p class="card-text">Meninggal : {{ k.summary.korban.md }}</p>
+                                        <p class="card-text">Hilang : {{ k.summary.korban.hilang }}</p>
+                                        <p class="card-text">Pengungsi : {{ k.summary.korban.pengungsi }}</p>
+                                      {% endif %}
+                                    </div>
+                                  </div>
+
+                                  <div class="col d-flex align-items-stretch">
+                                    <div class="card card-body">
+                                      <h6 class="card-title">Kerusakan Bangunan Umum</h6>
+                                      {% if k.summary.bangunan.total == 0 %}
+                                        <p class="card-text">Tidak Ada Kerusakan</p>
+                                      {% else %}
+                                        <p class="card-text">Rumah : {{ k.summary.bangunan.rumah }}</p>
+                                        <p class="card-text">Sekolah : {{ k.summary.bangunan.sekolah }}</p>
+                                        <p class="card-text">Tempat Ibadah : {{ k.summary.bangunan.t_ibadah }}</p>
+                                      {% endif %}
+                                    </div>
+                                  </div>
+
+                                  <div class="col d-flex align-items-stretch">
+                                    <div class="card card-body">
+                                      <h6 class="card-title">Kerusakan Bangunan Air</h6>
+                                      {% if k.summary.air.total == 0 %}
+                                        <p class="card-text">Tidak Ada Kerusakan</p>
+                                      {% else %}
+                                        <p class="card-text">Sungai : {{ k.sungai }}</p>
+                                        <p class="card-text">Sawah : {{ k.sawah }} Ha</p>
+                                        <p class="card-text">Bangunan Air : {{ k.bangunan }}</p>
+                                      {% endif %}
+                                    </div>
+                                  </div>
+
+                                  <div class="col d-flex align-items-stretch">
+                                    <div class="card card-body">
+                                      <h6 class="card-title">Kerusakan Jalan</h6>
+                                      {% if k.summary.jalan.total == 0 %}
+                                        <p class="card-text">Tidak Ada Kerusakan</p>
+                                      {% else %}
+                                        <p class="card-text">Jalan : {{ k.jalan }} Km</p>
+                                        <p class="card-text">Jalan Putus : {{ k.jalan_putus }} Km</p>
+                                        <p class="card-text">Jembatan : {{ k.jembatan }}</p>
+                                      {% endif %}
+                                    </div>
+                                  </div>
+
+                                </div>
+                                <br>
+                                <h5 class="card-title">Daftar Desa Terdampak</h5>
+                                {% for prov, kab_ in k.sort_desa.items() %}
+                                    <ul>
+                                    {% for kab, kec_ in kab_.items() %}
+                                        {% for kec, desa in kec_.items() %}
+                                            <li>Kecamatan {{ kec }}</li>
+                                            <ul>
+                                            <li>{{ desa }}</li>
+                                            </ul>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endfor %}
+                                {% endfor %}
+                              </div>
+                            </div>
+                          </div>
+                          <br>
+                        {% endfor %}
+                      </div>
+                  </div>
+              </div>
+          {% endfor %}
+      </div>
+  </div>
+
+  <!-- Old Set Up -->
+  <!-- Year Selection Input -->
+  <!-- <div class="input-group">
+    <select class="custom-select" id="tahun" name="tahun" onchange="reload_page()">
+      {% for y in year_option %}
+        {% if y == year %}
+          <option value="{{ y }}" selected>{{ y }}</option>
+        {% else %}
+          <option value="{{ y }}">{{ y }}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+    <div class="input-group-append">
+      <label class="input-group-text" for="tahun">{{ count }} Kejadian</label>
+    </div>
+  </div> -->
+
+  <!-- then -->
+  <!-- Month Iteration and Kejadian Iteration inside it -->
+
+</div>
+
+{% endblock %}
+
+{% block extra_head %}
+<style>
+
+</style>
+
+{% endblock %}
+
+{% block extra_foot %}
+<!-- QuillJS HTML Editor -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+<script>
+    function reload_page(){
+        let el = document.getElementById("tahun");
+        let tahun = el.options[el.selectedIndex].value;
+        window.open(`/bencana?tahun=${tahun}`, "_self")
+    }
+    console.log("{{ year }}")
+</script>
+
+{% endblock %}

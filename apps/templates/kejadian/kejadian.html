@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+  <br>
+  <div>
+    <h3 class="d-inline">Daftar Bencana</h3>
+    <a class="btn btn-sm btn-outline-primary d-inline" href="{{ url_for('admin.tambah_kejadian') }}">Tambah</a>
+  </div>
+  <br>
+  <table class="table table-bordered">
+    <thead class="table-active">
+      <tr>
+        <th>No</th>
+        <th>Waktu</th>
+        <th>Jenis</th>
+        <th>Daerah</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for kejadian in all_kejadian %}
+        <tr>
+          <th>{{ loop.index }}</th>
+          <td>{{ kejadian.get_date_id() }}</td>
+          <td>{{ kejadian.jenis }}</td>
+          {% if kejadian.dampakdesa.count() %}
+            <td>Kab. {{ kejadian.dampakdesa.0.desa.kabupaten }}</td>
+          {% else %}
+            <td>Belum Ada Daerah</td>
+          {% endif %}
+          <td>
+            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.lihat_kejadian', kejadian_id=kejadian.id) }}">Lihat</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

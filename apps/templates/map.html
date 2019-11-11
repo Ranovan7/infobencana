@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="margin-left: 10px; margin-right: 0px; max-width: 99%">
+  <div class="row">
+    <div class="col-md-3 overflow-auto" style="position: relative; padding: 0px">
+      <h2>Daftar Bencana</h2>
+      <div id="listKejadian" style="width: 100%;" class="btn-group-vertical" data-toggle="buttons">
+        {% for k in kejadian %}
+          <div class="card" style="width: 100%;">
+            <div class="card-header" id="heading{{ k.id }}" style="display: inline">
+              <div class="row">
+                  <div class="col-sm-3">
+                      {% if k.jenis == "Banjir" %}
+                      <h1>
+                          <span class="badge badge-secondary">B</span>
+                      </h1>
+                      {% else %}
+                      <h1>
+                          <span class="badge badge-secondary">L</span>
+                      </h1>
+                      {% endif %}
+                  </div>
+                  <div class="col-sm-6">
+                      <b>{{ k.jenis }}</b>
+                      <br>
+                      <h6>
+                        {% if k.dampakdesa.0 %}
+                            <span id="keca{{ k.id }}">{{ k.dampakdesa.0.desa.kabupaten }}</span>
+                        {% else %}
+                            <span id="keca{{ k.id }}">Belum Ada Wilayah</span>
+                        {% endif %}
+                        <br>
+                        <small><span class="waktu" id="waktu{{ k.id }}" data-tgl="{{ k.waktu }}"></span></small>
+                      </h6>
+                  </div>
+                  <div class="col-sm-3">
+                      <button class="btn btn-sm btn-outline-secondary" data-toggle="collapse" data-target="#infoKejadian{{ k.id }}" aria-expanded="false" aria-controls="infoKejadian{{ k.id }}">
+                          {% if k.id == kid %}
+                            <input type="radio" name="kejadian" id="kejadian{{ k.id }}" value="{{ k.id }}" style="display: none" checked>
+                          {% else %}
+                            <input type="radio" name="kejadian" id="kejadian{{ k.id }}" value="{{ k.id }}" style="display: none">
+                          {% endif %}
+                          Info
+                      </button>
+                  </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Collapsible to show summary of kejadian -->
+          {% if k.id == kid %}
+            <div class="collapse show" id="infoKejadian{{ k.id }}" data-parent="#listKejadian" style="width: 100%">
+          {% else %}
+            <div class="collapse" id="infoKejadian{{ k.id }}" data-parent="#listKejadian" style="width: 100%">
+          {% endif %}
+            <div class="card card-body">
+              <p>Penyebab</p>
+              <pre>{{ k.sebab }}</pre>
+              <p>Desa Terdampak sebanyak {{ k.dampakdesa_count }} desa.</p>
+            </div>
+          </div>
+
+        {% endfor %}
+
+      </div>
+    </div>
+    <div class="col-md-9 sticky-top" style="max-height: 675px">
+    	<div id="mymap" style="border: solid 1px #eee; height: 675px">
+        <!-- <div class="leaflet-control-container">
+          <div class="leaflet-top leaflet-right">
+            <div class="info leaflet-control">
+              this part is dynamically controlled, info that automatically updated
+            </div>
+          </div>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+   integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+   crossorigin=""></script>
+   <style>
+     #map {
+       width: 800px;
+       height: 500px;
+     }
+     .info {
+       padding: 6px 8px;
+       font: 14px/16px Arial, Helvetica, sans-serif;
+       background: white;
+       background: rgba(255,255,255,0.8);
+       box-shadow: 0 0 15px rgba(0,0,0,0.2);
+       border-radius: 5px;
+     }
+     .info h6 {
+       margin: 0 0 5px;
+       color: #777;
+     }
+     .legend {
+       text-align: left;
+       line-height: 18px;
+       color: #555;
+     }
+     .legend i {
+       width: 18px;
+       height: 18px;
+       float: left;
+       margin-right: 8px;
+       opacity: 0.7;
+     }
+     pre {
+         white-space: pre-wrap;
+         /* white-space: normal; */
+     }
+     p {
+       margin: 0px;
+     }
+   </style>
+
+{% endblock %}
+
+{% block extra_foot %}
+<!-- Bring in the leaflet KML plugin -->
+<!-- <script src="{{ url_for('static', filename='js/L.KML.js') }}"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/id.js"></script>
+<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
+<script>
+  "use struct"
+
+  moment.locale('id');
+  $('.waktu').each(function (i, e) {
+    console.log($(e).prepend(moment($(e).data('tgl')).fromNow()));
+  });
+
+  let mymap = L.map('mymap').setView([-7.5099, 111.5], 9)
+
+  L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+        maxZoom: 18,
+        id: 'data.streets',
+        attribution: 'M&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+     }
+  ).addTo(mymap)
+
+
+  // rendering information
+  // var info = L.control()
+
+  // uncommenting this will add an element that able to update everytime a geojson is hovered
+  // info.onAdd = function (mymap) {
+  //   this._div = L.DomUtil.create('div', 'info')
+  //   this.update()
+  //   return this._div
+  // }
+
+  // this is the info that will be updated
+  // info.update = function (props) {
+  //   this._div.innerHTML = '<h6>Desa Terdampak</h6>' + (
+  //       props ? '<b>Desa ' + props.desa + '</b><br />'
+  //       + '<b>Kec. ' + props.kecamatan + '</b><br />'
+  //       + '<b>Kab. ' + props.kabupaten + '</b><br />'
+  //       + '<b>' + props.provinsi + '</b><br />'
+  //       + '<br>'
+  //       + '<b>Korban</b><br />'
+  //       + 'Mengungsi : ' + props.pengungsi + '<br>'
+  //       + 'Luka : ' + props.luka + '<br>'
+  //       + 'Meninggal Dunia : ' + props.md + '<br>'
+  //       + 'Hilang : ' + props.hilang + '<br>'
+  //       + '<br>'
+  //       + '<b>Kerusakan</b><br />'
+  //       + 'Rumah : ' + props.rumah + '<br>'
+  //       + 'Sekolah : ' + props.sekolah + '<br>'
+  //       + 'Tempat Ibadah : ' + props.t_ibadah + '<br>'
+  //       : 'Pilih Desa yang ingin dilihat'
+  //   )
+  // }
+
+  // info.addTo(mymap)
+
+  let kmlGroup = L.geoJSON(null, {
+      style: {
+          color: "#808080",
+          weight: 4
+      }
+  });
+
+  // Load kml file
+  let kml1 = omnivore.kml("{{ url_for('static', filename='kml/hilir.kml') }}", null, kmlGroup).addTo(mymap);
+  let kml2 = omnivore.kml("{{ url_for('static', filename='kml/hulu.kml') }}", null, kmlGroup).addTo(mymap);
+  let kml3 = omnivore.kml("{{ url_for('static', filename='kml/madiun.kml') }}", null, kmlGroup).addTo(mymap);
+
+  function style(feature) {
+      return {
+          weight: 2,
+          opacity: 1,
+          color: 'white',
+          dashArray: '3',
+          fillOpacity: 0.7,
+          fillColor: "#2f4f4f"
+      }
+  }
+
+  function highlightFeature(e) {
+      var layer = e.target
+      layer.setStyle(
+          {
+              weight: 5,
+              color: '#161616',
+              dashArray: '',
+              fillOpacity: 0.7
+          }
+      )
+      if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+          layer.bringToFront()
+      }
+      // info.update(layer.feature.properties)
+  }
+
+  function resetHighlight(e) {
+      geojson.resetStyle(e.target)
+      // info.update()
+  }
+
+  function zoomToFeature(e) {
+      mymap.fitBounds(e.target.getBounds())
+  }
+
+  function onEachFeature(feature, layer) {
+      layer.bindPopup('<h6>Desa Terdampak</h6>' + (
+              feature.properties ? '<b>Desa ' + feature.properties.desa + '</b>'
+              + '<b>, Kec. ' + feature.properties.kecamatan + '</b>'
+              + '<b>, Kab. ' + feature.properties.kabupaten + '</b>'
+              + '<br>'
+              + '<b>Korban</b><br />'
+              + 'Mengungsi : ' + feature.properties.pengungsi + '<br>'
+              + 'Luka : ' + feature.properties.luka + '<br>'
+              + 'Meninggal Dunia : ' + feature.properties.md + '<br>'
+              + 'Hilang : ' + feature.properties.hilang + '<br>'
+              + '<br>'
+              + '<b>Kerusakan</b><br />'
+              + 'Rumah : ' + feature.properties.rumah + '<br>'
+              + 'Sekolah : ' + feature.properties.sekolah + '<br>'
+              + 'Tempat Ibadah : ' + feature.properties.t_ibadah + '<br>'
+              : 'Pilih Desa yang ingin dilihat'
+          )
+      )
+      layer.on(
+          {
+              mouseover: highlightFeature,
+              mouseout: resetHighlight
+          }
+      )
+  }
+
+  let violetIcon = new L.Icon({
+        iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+  });
+
+  let blueIcon = new L.Icon({
+        iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [17, 30],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+  });
+
+  function markerGenerator(data, icon, isPop=true){
+      console.log(`Point : ${data.geometry.coordinates} from ${kejadian_id}`)
+      let marker = L.marker([data.geometry.coordinates[1], data.geometry.coordinates[0]], {icon: icon}).addTo(mymap)
+
+      if (isPop) {
+          marker.on('click', function(event) {
+                  mymap.fitBounds(geojson.getBounds())
+              }
+          )
+          marker.bindPopup(data.properties.description).openPopup()
+      } else {
+          marker.bindPopup(data.properties.description)
+      }
+  }
+
+  function show_location(data, kejadian_id) {
+      // clear all layers firsts
+      mymap.eachLayer(
+          function(layer) {
+              if (!layer._url || !layer._events){
+                  mymap.removeLayer(layer)
+              } else {
+                  console.log(layer)
+              }
+          }
+      )
+
+      // setting map into default position
+      mymap.setView([-7.5099, 111.5])
+      mymap.setZoom(9)
+
+      // render new layer for new data
+      geojson = L.geoJson(
+          data,
+          {
+              style: style,
+              onEachFeature: onEachFeature
+          }
+      ).addTo(mymap)
+
+      // Load kml file
+      let kml1 = omnivore.kml("{{ url_for('static', filename='kml/hilir.kml') }}", null, kmlGroup).addTo(mymap);
+      let kml2 = omnivore.kml("{{ url_for('static', filename='kml/hulu.kml') }}", null, kmlGroup).addTo(mymap);
+      let kml3 = omnivore.kml("{{ url_for('static', filename='kml/madiun.kml') }}", null, kmlGroup).addTo(mymap);
+
+      console.log(`Show Location ${kejadian_id}`)
+
+      // place marker
+      fetch(`/api/kejadian/${kejadian_id}/get_point`) // Call the fetch function passing the url of the API as a parameter
+        .then(response => response.json())
+        .then(function(data) {
+                markerGenerator(data, violetIcon)
+            }
+        )
+        .catch(e => console.log(`Error found : ${e}`))
+
+      console.log(`Show Location ${kejadian_id}`)
+
+      // place markers for sumber hidrologi
+      fetch(`/api/kejadian/${kejadian_id}/get_hidrologi`) // Call the fetch function passing the url of the API as a parameter
+        .then(response => response.json())
+        .then(function(data) {
+                data.forEach(function (item) {
+                    markerGenerator(item, blueIcon, isPop=false)
+                })
+            }
+        )
+        .catch(e => console.log(`Error found : ${e}`))
+  }
+
+  // initial value
+  let kejadian_id = $('input[name=kejadian]:checked').val()
+  console.log(`kejadian ID : ${kejadian_id}`)
+  if ({{ kid }}) {
+      fetch(`/api/kejadian/${kejadian_id}/dampakdesa`) // Call the fetch function passing the url of the API as a parameter
+        .then(response => response.json())
+        .then(data => show_location(data, kejadian_id))
+        .catch(e => console.log(`Error found : ${e}`))
+  }
+
+  // on kejadian value changes
+  $("input[name=kejadian]").change(function(){
+      let kejadian_id = $('input[name=kejadian]:checked').val()
+      console.log(`kejadian ID : ${kejadian_id}`)
+      fetch(`/api/kejadian/${kejadian_id}/dampakdesa`) // Call the fetch function passing the url of the API as a parameter
+        .then(response => response.json())
+        .then(data => show_location(data, kejadian_id))
+        .catch(e => console.log(`Error found : ${e}`))
+  })
+
+ </script>
+{% endblock extra_foot %}

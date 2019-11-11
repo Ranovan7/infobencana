@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+	<h1>Catat Kejadian</h1>
+<form action="">
+	<div class="row">
+	<div class="form-group col">
+    <label>Kejadian</label><br>
+			<div class="form-check form-check-inline">
+			  <input class="form-check-input" type="checkbox" id="gridCheck1">
+			  <label class="form-check-label" for="gridCheck1">Banjir</label>
+				<input class="form-check-input" type="checkbox" id="gridCheck2">
+				<label class="form-check-label" for="gridCheck2">Longsor</label>
+			</div>
+	</div>
+
+	<div class="form-group col">
+		<label for="waktu">Waktu</label>
+		<input type="text" name="waktu" class="form-control" value="{{ now.strftime('%d-%m-%Y') }}">
+	</div>
+	<div class="form-group col">
+		<label for="jam">Jam</label>
+		<input type="text" name="jam" class="form-control" value="{{ now.strftime('%H') }}">
+	</div>
+	</div> <!-- row -->
+
+	<div class="row">
+    <div class="col">
+    <div class="form-group">
+      <label for="exampleFormKronologi">Kronologi Kejadian</label>
+      <textarea class="form-control" rows="2"> * Tanggaul jebol
+	   * Pendangkalan sungai
+	   * Luapan air sungai
+	   * Hujan intensitas tinggi
+	   * Drainase buruk
+	   * Aktifitas pembangunan infrastruktur
+	   * Gangguan alur/badan sungai
+	   * Penambangan liar
+	   * Aktifitas Masyarakat/pihak lain</textarea>
+    </div>
+    </div>
+  </div>
+
+	<div class="row">
+    <div class="col">
+    <div class="form-group">
+      <label for="exampleFormKronologi">Penanganan Yang Telah Dilakukan</label>
+      <textarea class="form-control" rows="2"></textarea>
+    </div>
+    </div>
+  </div>
+
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="form-group"><label>Prasarana SDA / Pertanian</label>
+			<div class="form-inline">
+				<label for="md">Sawah <input name="sawah" type="text" class="text-right form-control" size="3" value="0"> Ha</label>
+				<label class="ml-3" for="luka">Sungai <input name="sungai" type="text" class="text-right form-control" size="3" value="0"></label>
+				<label class="ml-3" for="hilang">Bangunan Pengairan <input name="" type="text" class="text-right form-control" size="3" value="0"></label>
+			</div>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="form-group"><label>Prasarana Jalan & Jembatan</label>
+			<div class="form-inline">
+				<label>Jalan Tergenang <input name="rumah" type="text" class="text-right form-control" size="3" value="0"> m</label>
+				<label class="ml-3">Jalan Putus <input name="jalan_putus" type="text" class="text-right form-control" size="3" value="0"> unit</label>
+				<label class="ml-3">Jembatan <input name="jembatan" type="text" class="text-right form-control" size="3" value="0"> unit</label>
+			</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">
+    <div class="form-group">
+			<label for="desa">Desa</label>
+				<select name="desa" class="form-control custom-select" id="desa">
+					<option>pilih</option>
+				</select>
+		</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="form-group"><label>Korban Jiwa</label>
+			<div class="form-inline">
+				<label for="md">MD<input name="md" type="text" class="text-right form-control" size="3" value="0"></label>
+				<label class="ml-3" for="luka">Luka<input name="luka" type="text" class="text-right form-control" size="3" value="0"></label>
+				<label class="ml-3" for="hilang">Hilang<input name="hilang" type="text" class="text-right form-control" size="3" value="0"></label>
+				<label class="ml-3" for="pengungsi">Pengungsi<input name="hilang" type="text" class="text-right form-control" size="3" value="0"></label>
+			</div>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="form-group"><label>Kerusakan Pemukiman</label>
+			<div class="form-inline">
+				<label>Rumah<input name="rumah" type="text" class="text-right form-control" size="3" value="0"></label>
+				<label class="ml-3">Sekolah<input name="sekolah" type="text" class="text-right form-control" size="3" value="0"></label>
+				<label class="ml-3">Tempat Ibadah<input name="tempat_ibadah" type="text" class="text-right form-control" size="3" value="0"></label>
+			</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="row">
+		<div class="col">
+    <div class="custom-file">
+			<input type="file" class="custom-file-input">
+			<label for="">Pilih file</label>
+		</div>
+		</div>
+	</div>
+
+<hr>
+
+<h4>Data Hidrologi</h4>
+<div class="row">
+	<div class="form-group col">
+    <label for="exampleInputPos">Pos</label>
+    <input type="text" class="form-control" id="exampleInputPos" aria-describedby="posHelp" placeholder="">
+	</div>
+	<div class="form-group col">
+		<label for="waktu">Tanggal:</label>
+		<input type="date" name="">
+	</div>
+	<div class="form-group col">
+		<label for="exampleInputCurahhujan">Curah Hujan</label>
+			<input type="text" class="form-control row" id="exampleInputCurahhujan" aria-describedby="curahhujanHelp" placeholder=""> mm
+	</div>
+</div>
+
+</div>
+   </form>
+
+<hr>
+	<form>
+	<h4>Foto Kejadian</h4>
+
+  <div class="form-group">
+    <label for="exampleFormControlFile1">Foto</label>
+    <input type="file" class="form-control-file" id="exampleFormControlFile1">
+  </div>
+</form>
+{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/select2.min.css') }}">
+{% endblock %}
+{% block extra_foot %}
+<script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+  <script>
+		$(function() {
+			$('#desa').select2({
+				tags: true,
+				minimumInputLength: 3,
+				templateResult: formatResult,
+				ajax: {
+					url: function (params) {
+						return '/api/desa?q=' + params.term;
+					},
+					dataType: 'json',
+					processResults: function(data) {
+						console.log(data);
+						let rst = $.map(data, function(e) {
+							e.id = e.id;
+							e.text = e.desa + ' Kec.' + e.kecamatan + ' Kab. ' + e.kabupaten;
+							return e;
+						});
+						return {
+							results: rst
+						};
+					}
+				}
+			});
+
+			function formatResult(data) {
+				return data.desa + ' Kec. ' + data.kecamatan + ' Kab. ' + data.kabupaten;
+			}
+		});
+  </script>
+{% endblock %}

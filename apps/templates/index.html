@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-secondary">
+  <header class="masthead">
+    <div class="container d-flex h-100 align-items-center col-lg-8 col-xs-12">
+      <div class="mx-auto text-center">
+        <h1 class="mx-auto my-0">Info Bencana</h1>
+        <h2 class="text-white-50 mx-auto mt-2 mb-5">Balai Besar Wilayah Sungai Bengawan Solo</h2>
+        <div class="container align-items-center" align="center">
+          {% for i in info %}
+            <h4 class="btn btn-danger btn-lg">{{ i.tahun }} - <a class="text-dark" href="{{ url_for('core.daftar_bencana', tahun=i.tahun) }}">{{ i.jumlah }} Kejadian</a></h4>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+</div>
+
+{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css?family=Varela+Round&display=swap" rel="stylesheet">
+
+<style>
+.masthead h1 {
+  font-family: 'Varela Round';
+  font-size: 4rem;;
+  line-height: 4rem;
+  letter-spacing: .8rem;
+  /* background: -webkit-linear-gradient(
+    rgba(255,255,255,.9),
+    rgba(255,255,255,0)
+  ); */
+  -webkit-text-fill-color: white; /* transparent */
+  /* -webkit-background-clip: text; */
+}
+
+.masthead h2 {
+  max-width: 25rem;
+  font-size: 2rem;
+}
+
+.masthead {
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 35rem;
+  padding: 12rem 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(22,22,22,.3) 0,
+    rgba(22,22,22,.7) 75%,
+    #161616 100%
+  );
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+  background-size: cover;
+}
+
+.d-flex {
+  display: flex!important;
+}
+
+.h-100 {
+  height: 100%!important;
+}
+
+.daftar-sec {
+  padding: 10rem 0;
+  background: linear-gradient(
+    to bottom,
+    #161616 0,
+    rgba(22,22,22,.7) 25%,
+    rgba(22,22,22,.9) 100%
+  );
+}
+
+/* unvisited link */
+a:link {
+  color: grey;
+}
+
+/* visited link */
+a:visited {
+  color: grey;
+}
+
+/* mouse over link */
+a:hover {
+  color: silver;
+}
+
+/* selected link */
+a:active {
+  color: silver;
+}
+</style>
+
+{% endblock %}
