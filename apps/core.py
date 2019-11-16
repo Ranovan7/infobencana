@@ -50,7 +50,8 @@ def index():
 def daftar_bencana():
     year = int(request.args.get('tahun', datetime.now().year))
     picked_kejadian = Kejadian.query.filter(
-        extract('year', Kejadian.waktu) == year, Kejadian.dampakdesa.any())
+        extract('year', Kejadian.waktu) == year, Kejadian.dampakdesa.any()).order_by(
+        desc(Kejadian.waktu))
     results = {}
     kejadian_count = 0
     for kejadian in picked_kejadian:

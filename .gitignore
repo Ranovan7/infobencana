@@ -2,3 +2,4 @@
 .env
 venv
 apps/static/uploaded_photos/*
+apps/__pycache__/

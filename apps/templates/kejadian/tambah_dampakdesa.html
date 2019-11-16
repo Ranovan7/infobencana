@@ -211,7 +211,8 @@
         // popup containing desa name
         geojson.bindPopup(`<b>${data.properties.desa}, ${data.properties.kecamatan}, ${data.properties.kabupaten}</b>`).openPopup()
         // zoom to desa
-        mymap.fitBounds(geojson.getBounds())
+        // mymap.fitBounds(geojson.getBounds())
+        mymap.setView(geojson.getBounds().getCenter(), 12);
     }
 
     // check if desa got value
