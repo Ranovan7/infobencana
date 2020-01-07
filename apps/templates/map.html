@@ -263,8 +263,8 @@
   }
 
   let violetIcon = new L.Icon({
-        iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconUrl: "{{ url_for('static', filename='images/marker-icon-orange.png') }}",
+        shadowUrl: "{{ url_for('static', filename='images/marker-shadow.png') }}",
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
@@ -272,8 +272,8 @@
   });
 
   let blueIcon = new L.Icon({
-        iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconUrl: "{{ url_for('static', filename='images/sumber-air.png') }}",
+        shadowUrl: "{{ url_for('static', filename='images/marker-shadow.png') }}",
         iconSize: [17, 30],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
