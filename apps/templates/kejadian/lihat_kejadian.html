@@ -222,7 +222,8 @@
   <div>
     <ul>
       {% for foto in context.kejadian.foto %}
-        <img src="{{ url_for('static', filename=foto.get_url()) }}" class="img-fluid" alt="Responsive image">
+        <img src="{{ config.UPLOAD_FOLDER }}{{ foto.get_url() }}" class="img-fluid" alt="Responsive image">
+        <!-- {{ config.UPLOAD_FOLDER }}{{ foto.get_url() }} -->
       {% endfor %}
     </ul>
   </div>

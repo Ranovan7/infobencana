@@ -190,7 +190,7 @@ class Foto(db.Model):
     muser = db.Column(db.String(15))
 
     def get_url(self):
-        return f"uploaded_photos/{self.filename}"
+        return f"{self.filename}"
 
 
 class User(UserMixin, db.Model):

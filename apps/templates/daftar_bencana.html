@@ -6,15 +6,9 @@
       <div class="col-sm-2">
           <!-- Pilihan Tahun -->
           <div class="form-group">
-              <select class="custom-select" id="tahun" name="tahun" onchange="reload_page()">
-                {% for y in year_option %}
-                  {% if y == year %}
-                    <option value="{{ y }}" selected>{{ y }}</option>
-                  {% else %}
-                    <option value="{{ y }}">{{ y }}</option>
-                  {% endif %}
-                {% endfor %}
-              </select>
+              <div class="form-control">
+                  <span id="datepicker"><i class="fas fa-calendar"></i> {{ year }}</span>
+              </div>
           </div>
           <div class="form-group">
               <h3>
@@ -193,17 +187,31 @@
 {% endblock %}
 
 {% block extra_head %}
-<style>
-
-</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css">
+    <style>
+        .datepicker {
+            z-index: 10000 !important;
+        }
+    </style>
 
 {% endblock %}
 
 {% block extra_foot %}
 <!-- QuillJS HTML Editor -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
 <script>
+    $('#datepicker').datepicker({
+        todayHighlight: true,
+        autoclose: true,
+        format: 'yyyy',
+        viewMode: "years",
+        minViewMode: "years"
+    });
+    $('#datepicker').on('changeDate', function () {
+        window.location = "{{ url_for('core.daftar_bencana') }}?tahun=" + $('#datepicker').datepicker('getFormattedDate')
+    });
+
     function reload_page(){
         let el = document.getElementById("tahun");
         let tahun = el.options[el.selectedIndex].value;

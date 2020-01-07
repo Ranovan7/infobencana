@@ -48,7 +48,8 @@ def index():
 
 @bp.route('/bencana/', strict_slashes=False)
 def daftar_bencana():
-    year = int(request.args.get('tahun', datetime.now().year))
+    latest = Kejadian.query.order_by(desc(Kejadian.waktu)).first()
+    year = latest.waktu.year
     picked_kejadian = Kejadian.query.filter(
         extract('year', Kejadian.waktu) == year, Kejadian.dampakdesa.any()).order_by(
         desc(Kejadian.waktu))
