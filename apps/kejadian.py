@@ -286,7 +286,8 @@ def update_kejadian(kejadian_id):
     )
     print("Updating Kejadian")
     if form.validate_on_submit():
-        kejadian.waktu = request.values.get('waktu')
+        waktu_raw = request.values.get('waktu').split('-')
+        kejadian.waktu = f"{waktu_raw[2]}-{waktu_raw[1]}-{waktu_raw[0]}"
         kejadian.jenis = request.values.get('jenis')
         kejadian.sebab = request.values.get('sebab')
         kejadian.sungai = request.values.get('sungai')
