@@ -99,7 +99,8 @@ def tambah_kejadian():
     '''Form Menambah Index'''
     form = KejadianForm()
     if form.validate_on_submit():
-        waktu = request.values.get('waktu')
+        waktu_raw = request.values.get('waktu').split('-')
+        waktu = f"{waktu_raw[2]}-{waktu_raw[1]}-{waktu_raw[0]}"
         jenis = request.values.get('jenis')
         sebab = request.values.get('sebab')
         sungai = request.values.get('sungai')
@@ -125,7 +126,7 @@ def tambah_kejadian():
             tindakan=tindakan,
         )
 
-        print(new_kejadian.waktu)
+        print(waktu)
 
         db.session.add(new_kejadian)
         db.session.flush()
