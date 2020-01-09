@@ -124,6 +124,9 @@ def tambah_kejadian():
             lama=lama,
             tindakan=tindakan,
         )
+
+        print(new_kejadian.waktu)
+
         db.session.add(new_kejadian)
         db.session.flush()
         newest_id = new_kejadian.id
